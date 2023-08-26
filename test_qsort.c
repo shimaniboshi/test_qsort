@@ -36,11 +36,10 @@ void make_random_string(char* buffer, int max_length) {
 
 void make_test_records(LPRecord records, int entry) {
 
-	srand((unsigned int)time(NULL));
 	for (int i = 0; i < entry; i++) {
 
 		char buffer[MAX_NAME_LENGTH] = {0};
-		make_random_string(buffer, MAX_NAME_LENGTH);
+		make_random_string(buffer, MAX_NAME_LENGTH - 1);
 
 		Record rec;
 		rec.id = rand();
@@ -84,7 +83,7 @@ int (*select_comp_func(void))(const void*, const void*) {
 		puts("Please select a comparator function which will be used in sort process.");
 		printf("Sort by id => 0 / Sort by name => 1 : ");
 		scanf("%d", &func_number);
-		if (func_number < 0 || 2 <= func_number) {
+		if (func_number < 0 || 1 < func_number) {
 			continue;
 		}
 		break;
@@ -125,6 +124,7 @@ int main(void) {
 	
 
 	// Create test data and set them to 'records'
+	srand((unsigned int)time(NULL));
 	make_test_records(records, entry);
 
 
@@ -163,7 +163,7 @@ int main(void) {
 		print_single_rec(*record_pointers[i]);
 	}
 
-	// Clean up the memory of the pointers array prior to that of the records array which they point
+	// Clean up the memory of the pointers array prior to that of the records array which they point to
 	free(record_pointers);
 	record_pointers = NULL;
 
