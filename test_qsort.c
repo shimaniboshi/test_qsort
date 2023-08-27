@@ -8,18 +8,19 @@
 #define MEMORY_ERROR -1
 #define MAX_NAME_LENGTH 32
 
-#define print_single_rec(x) {printf("id = %10d\tname = %s\n", (x).id, (x).name);}
+#define print_single_rec(x) {printf("id = %10d\tname_length = %3d\tname = %s\n", (x).id, (x).name_length, (x).name);}
 
 
 
 typedef struct Record {
 	int id;
+	int name_length;
 	char name[MAX_NAME_LENGTH];
 } Record, * LPRecord;
 
 
 
-void make_random_string(char* buffer, int max_length) {
+int make_random_string(char* buffer, int max_length) {
 
 	int cnt = 0;
 	int length = rand() / ((RAND_MAX / max_length) + 1);
@@ -30,7 +31,9 @@ void make_random_string(char* buffer, int max_length) {
 			buffer[cnt] = c;
 			cnt++;
 		}
-	} while (cnt < length);
+	} while (cnt <= length);
+
+	return cnt;
 }
 
 
@@ -39,10 +42,11 @@ void make_test_records(LPRecord records, int entry) {
 	for (int i = 0; i < entry; i++) {
 
 		char buffer[MAX_NAME_LENGTH] = {0};
-		make_random_string(buffer, MAX_NAME_LENGTH - 1);
+		int length = make_random_string(buffer, MAX_NAME_LENGTH - 1);
 
 		Record rec;
 		rec.id = rand();
+		rec.name_length = length;
 		strcpy(rec.name, buffer);
 
 		records[i] = rec;
@@ -62,6 +66,10 @@ int comp_by_name(const void* rec_1, const void* rec_2) {
 }
 
 
+int comp_by_namelength(const void* rec_1, const void* rec_2) {
+	return (*((LPRecord*)rec_1))->name_length - (*((LPRecord*)rec_2))->name_length;		// Ascending-order
+	//return (*((LPRecord*)rec_2))->name_length - (*((LPRecord*)rec_1))->name_length;	// Descending-order
+}
 
 
 // Definition of a function with no arguments which takes void * and void * arguments and returns a pointer to a function which returns an int type
@@ -70,20 +78,22 @@ int (*select_comp_func(void))(const void*, const void*) {
 
 	enum CompareMethod {
 		ById,		// 0
-		ByName,		// 1
+		ByNameLength,	// 1
+		ByName,		// 2
 	} func_number;
 
 	// Array consisting of function pointers
-	int (*comp_func[2])(const void*, const void*) = {
+	int (*comp_func[3])(const void*, const void*) = {
 		comp_by_id,
+		comp_by_namelength,
 		comp_by_name,
 	};
 
 	while (1) {
 		puts("Please select a comparator function which will be used in sort process.");
-		printf("Sort by id => 0 / Sort by name => 1 : ");
+		printf("Sort by id => 0 / by name length => 1 / by name => 2 : ");
 		scanf("%d", &func_number);
-		if (func_number < 0 || 1 < func_number) {
+		if (func_number < 0 || 2 < func_number) {
 			continue;
 		}
 		break;
