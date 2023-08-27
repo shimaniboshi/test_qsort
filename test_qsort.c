@@ -11,6 +11,8 @@
 #define print_single_rec(x) {printf("id = %10d\tname_length = %3d\tname = %s\n", (x).id, (x).name_length, (x).name);}
 
 
+typedef int (*Comparator)(const void*, const void*);
+
 
 typedef struct Record {
 	int id;
@@ -72,9 +74,9 @@ int comp_by_namelength(const void* rec_1, const void* rec_2) {
 }
 
 
-// Definition of a function with no arguments which takes void * and void * arguments and returns a pointer to a function which returns an int type
+// Definition of a function with no arguments which returns a pointer to a function which takes void * and void * arguments and returns an int type
 // The returned value (function pointer) will be used in 4th argument of qsort() function.
-int (*select_comp_func(void))(const void*, const void*) {
+Comparator select_comp_func(void) {		// int (*select_comp_func(void))(const void*, const void*)
 
 	enum CompareMethod {
 		ById,		// 0
@@ -83,7 +85,7 @@ int (*select_comp_func(void))(const void*, const void*) {
 	} func_number;
 
 	// Array consisting of function pointers
-	int (*comp_func[3])(const void*, const void*) = {
+	Comparator comp_func[3] = {		 // int (*comp_func[3])(const void*, const void*)
 		comp_by_id,
 		comp_by_namelength,
 		comp_by_name,
@@ -109,8 +111,9 @@ int main(void) {
 
 
 	int entry;
-	int (*comp_func)(const void*, const void*);		// Pointer to a function
 
+	// Pointer to a function
+	Comparator comp_func;			//int (*comp_func)(const void*, const void*);	
 
 	while (1) {
 		printf("How many test records are you going to make?: ");
